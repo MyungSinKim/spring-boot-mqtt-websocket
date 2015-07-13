@@ -1,0 +1,28 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+sourceCompatibility = '1.8'
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+if (!hasProperty('mainClass')) {
+    ext.mainClass = 'jp.pigumer.web.Index'
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url "https://repo.eclipse.org/content/repositories/paho-releases/"
+    }
+}
+
+dependencies {
+    compile "org.springframework.boot:spring-boot-starter-thymeleaf:1.2.5.RELEASE"
+    compile "org.springframework.boot:spring-boot-starter-websocket:1.2.5.RELEASE"
+    
+    compile 'javax.json:javax.json-api:1.0'
+    compile 'org.glassfish:javax.json:1.0'
+    
+    compile 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.0.2'
+    
+    testCompile "junit:junit:4.11"
+}
