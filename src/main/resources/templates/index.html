@@ -3,20 +3,18 @@
     <head>
         <meta charset="UTF-8"/>
         <title>test</title>
-        <script src="bower_components/jquery/dist/jquery.js" type="application/javascript"></script>
+        <script src="node_modules/jquery/dist/jquery.js" type="application/javascript"></script>
+        <script src="node_modules/stompjs/lib/stomp.js" type="application/javascript"></script>
         <script type="application/javascript">
-            var ws = new WebSocket('ws://' + location.host + location.pathname + 'sample');
-            ws.onopen = function(event) {
-              console.log(event);  
-            };
-            ws.onclose = function(event) {
-              console.log(event);
-            };
-            ws.onmessage = function(event) {
-              message = $.parseJSON(event.data);
-              $('body').empty().append(message.message);
-              console.log(message);
-            };
+            var stompClient = function() {
+                var ws = new WebSocket('ws://' + location.host + location.pathname + 'sample');
+                var client = Stomp.over(ws);
+                client.connect(function(frame) {
+                    client.subscribe("test", function(message) {
+                        $('body').empty().append(message);
+                    });
+                });
+            }
         </script>        
     </head>
     <body>

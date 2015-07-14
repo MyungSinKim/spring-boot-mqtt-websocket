@@ -1,5 +1,6 @@
 package jp.pigumer.web;
 
+import jp.pigumer.mqtt.Client;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -19,10 +20,10 @@ public class Index {
     public String index() {
         return "index";
     }
-    
+
     @Bean
-    public ServerEndpointExporter endpointExporterInitializer() {
-        return new ServerEndpointExporter();
+    public Client mqttClient() {
+        return new Client();
     }
     
     public static void main(String[] args) {
