@@ -50,7 +50,7 @@ public class Client implements MqttCallback, InitializingBean, DisposableBean {
     @Override
     public void messageArrived(String topic, MqttMessage message) throws Exception {
         LOGGER.info(topic + ": " + message);
-        template.convertAndSend(topic, message);
+        template.convertAndSend("/topic/" + topic, message.toString());
     }
 
     @Override
