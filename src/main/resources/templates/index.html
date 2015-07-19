@@ -13,8 +13,7 @@
                 var ws = new WebSocket('ws://' + location.host + location.pathname + 'sample');
                 ws.onerror = function(e) {
                     $('#panel').removeClass('panel-primary');
-                    $('#panel').addClass('panel-danger')
-                    console.log(e);
+                    $('#panel').addClass('panel-danger');
                     $('#message').empty().append(e.message);
                 };
                 var client = Stomp.over(ws);
@@ -29,8 +28,7 @@
                     function(e) {
                         // error
                         $('#panel').removeClass('panel-primary');
-                        $('#panel').addClass('panel-danger')
-                        console.log(e);
+                        $('#panel').addClass('panel-danger');
                         $('#message').empty().append(e.message);
                     }
                 );
@@ -38,9 +36,11 @@
         </script>        
     </head>
     <body>
-        <div id="panel" class="panel panel-primary">
-            <div class="panel-heading">Spring Boot with WebSocket Sample</div>
-            <div id="message" class="panel-body"></div>
+        <div class="container">
+            <div id="panel" class="panel panel-primary">
+                <div class="panel-heading">Spring Boot Sample</div>
+                <div id="message" class="panel-body"></div>
+            </div>
         </div>
     </body>
 </html>
