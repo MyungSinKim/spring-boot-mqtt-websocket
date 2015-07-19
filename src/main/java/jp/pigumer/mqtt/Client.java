@@ -22,7 +22,11 @@ public class Client implements MqttCallback, InitializingBean, DisposableBean {
     
     @Override
     public void afterPropertiesSet() throws Exception {
-        String url = "tcp://raspberrypi.local:1883";
+        String mqttHost = System.getenv("MQTTHOST");
+        mqttHost = null != mqttHost ? mqttHost : "raspberrypi.local";
+        String mqttPort = System.getenv("MQTTPORT");
+        mqttPort = null != mqttPort ? mqttPort : "1883";
+        String url = "tcp://" + mqttHost + ":" + mqttPort;
         String clientId = UUID.randomUUID().toString();
         client = new MqttClient(url, clientId);
         client.setCallback(this);
