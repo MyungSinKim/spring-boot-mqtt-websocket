@@ -2,26 +2,45 @@
 <html>
     <head>
         <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
         <title>test</title>
+        <link href="node_modules/bootstrap/dist/css/bootstrap.css" rel="stylesheet"/>
         <script src="node_modules/jquery/dist/jquery.js" type="application/javascript"></script>
+        <script src="node_modules/bootstrap/dist/js/bootstrap.js" type="application/javascript"></script>
         <script src="node_modules/stompjs/lib/stomp.js" type="application/javascript"></script>
         <script type="application/javascript">
             $(function() {
                 var ws = new WebSocket('ws://' + location.host + location.pathname + 'sample');
-                console.log(ws);
+                ws.onerror = function(e) {
+                    $('#panel').removeClass('panel-primary');
+                    $('#panel').addClass('panel-danger')
+                    console.log(e);
+                    $('#message').empty().append(e.message);
+                };
                 var client = Stomp.over(ws);
-                console.log(client);
-                client.connect({}, function(frame) {
-                    console.log(frame);
-                    client.subscribe("/topic/test", function(message) {
-                        console.log(message);
-                        console.log("message.body", message.body)
-                        $('body').empty().append(message.body);
-                    });
-                });
+                client.connect({},
+                    function(frame) {
+                        client.subscribe("/topic/test",
+                            function(message) {
+                                $('#message').empty().append(message.body);
+                            }
+                        );
+                    },
+                    function(e) {
+                        // error
+                        $('#panel').removeClass('panel-primary');
+                        $('#panel').addClass('panel-danger')
+                        console.log(e);
+                        $('#message').empty().append(e.message);
+                    }
+                );
             });
         </script>        
     </head>
     <body>
+        <div id="panel" class="panel panel-primary">
+            <div class="panel-heading">Spring Boot with WebSocket Sample</div>
+            <div id="message" class="panel-body"></div>
+        </div>
     </body>
 </html>

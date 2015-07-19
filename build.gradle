@@ -11,10 +11,14 @@ buildscript {
         classpath('se.transmode.gradle:gradle-docker:1.2')
     }
 }
+
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'spring-boot'
 apply plugin: 'docker'
+
+group = 'jp.pigumer'
+version = '1.0.0'
 
 sourceCompatibility = '1.8'
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
@@ -28,9 +32,7 @@ repositories {
 
 jar {
     baseName = 'spring-boot-sample'
-    version = '1.0.0-SNAPSHOT'
 }
-
 
 dependencies {
     compile "org.springframework.boot:spring-boot-starter-thymeleaf:1.2.5.RELEASE"
