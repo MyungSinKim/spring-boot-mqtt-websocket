@@ -1,6 +1,7 @@
 package jp.pigumer.mqtt;
 
 import java.util.UUID;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.inject.Inject;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -19,6 +20,11 @@ public class Client implements MqttCallback, InitializingBean, DisposableBean {
     SimpMessagingTemplate template;
     
     MqttClient client;
+
+    void subscribe(MqttClient client) throws Exception {
+        client.connect();
+        client.subscribe("test");
+    }
     
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -28,12 +34,11 @@ public class Client implements MqttCallback, InitializingBean, DisposableBean {
         mqttPort = null != mqttPort ? mqttPort : "1883";
         String url = "tcp://" + mqttHost + ":" + mqttPort;
         String clientId = UUID.randomUUID().toString();
+        
         client = new MqttClient(url, clientId);
         client.setCallback(this);
-        
-        client.connect();
-        
-        client.subscribe("test");
+
+        subscribe(client);
     }
 
     @Override
@@ -49,16 +54,23 @@ public class Client implements MqttCallback, InitializingBean, DisposableBean {
     
     @Override
     public void connectionLost(Throwable cause) {
+        LOGGER.log(Level.INFO, "connectionLost", cause);
+        try {
+            subscribe(client);
+        } catch (Exception e) {
+            LOGGER.log(Level.INFO, "connectionLost", e);
+        }
     }
 
     @Override
     public void messageArrived(String topic, MqttMessage message) throws Exception {
-        LOGGER.info(topic + ": " + message);
+        LOGGER.log(Level.INFO, String.format("%s: %s", topic, message));
         template.convertAndSend("/topic/" + topic, message.toString());
     }
 
     @Override
     public void deliveryComplete(IMqttDeliveryToken token) {
+        LOGGER.log(Level.INFO, token.toString());
     }
     
 }
