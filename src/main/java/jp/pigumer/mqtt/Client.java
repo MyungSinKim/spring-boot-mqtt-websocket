@@ -3,16 +3,16 @@ package jp.pigumer.mqtt;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
-import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
-public class Client implements MqttCallback, InitializingBean, DisposableBean {
+public class Client implements MqttCallback {
 
     private static final Logger LOGGER = Logger.getLogger(Client.class.getName());
     
@@ -26,7 +26,7 @@ public class Client implements MqttCallback, InitializingBean, DisposableBean {
         client.subscribe("test");
     }
     
-    @Override
+    @PostConstruct
     public void afterPropertiesSet() throws Exception {
         String mqttHost = System.getenv("MQTTHOST");
         mqttHost = null != mqttHost ? mqttHost : "raspberrypi.local";
@@ -41,7 +41,7 @@ public class Client implements MqttCallback, InitializingBean, DisposableBean {
         subscribe(client);
     }
 
-    @Override
+    @PreDestroy
     public void destroy() throws Exception {
         try {
             if (client.isConnected()) {
@@ -65,7 +65,7 @@ public class Client implements MqttCallback, InitializingBean, DisposableBean {
     @Override
     public void messageArrived(String topic, MqttMessage message) throws Exception {
         LOGGER.log(Level.INFO, String.format("%s: %s", topic, message));
-        template.convertAndSend("/topic/" + topic, message.toString());
+        template.convertAndSendToUser("testuser", "/queue/" + topic, message.toString());
     }
 
     @Override

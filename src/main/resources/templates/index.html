@@ -19,7 +19,7 @@
                 var client = Stomp.over(ws);
                 client.connect({},
                     function(frame) {
-                        client.subscribe("/topic/test",
+                        client.subscribe("/user/queue/test",
                             function(message) {
                                 $('#message').empty().append(message.body);
                             }

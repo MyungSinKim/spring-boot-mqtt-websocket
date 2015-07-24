@@ -21,7 +21,7 @@ public class Index {
     }
 
     @Bean
-    public Client mqttClient() {
+    public Client getClient() {
         return new Client();
     }
     
