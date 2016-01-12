@@ -28,7 +28,7 @@ public class Index {
     @Bean
     public Client getClient() throws IOException {
         DefaultResourceLoader loader = new DefaultResourceLoader();
-        Resource resource = loader.getResource("/var/lib/spring-boot-sample/mqtt.properties");
+        Resource resource = loader.getResource("file:/var/lib/spring-boot-sample/mqtt.properties");
         Properties properties;
         try (InputStream is = resource.getInputStream()) {
             properties = new Properties();
