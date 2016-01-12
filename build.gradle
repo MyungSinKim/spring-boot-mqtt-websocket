@@ -33,13 +33,14 @@ repositories {
 dependencies {
     compile "org.springframework.boot:spring-boot-starter-thymeleaf"
     compile "org.springframework.boot:spring-boot-starter-websocket"
-    providedRuntime("org.springframework.boot:spring-boot-starter-tomcat")
+    providedRuntime "org.springframework.boot:spring-boot-starter-tomcat"
     
     compile 'javax.json:javax.json-api:1.0'
     compile 'org.glassfish:javax.json:1.0'
 
     compile 'javax.inject:javax.inject:1'
     
+    compile 'org.bouncycastle:bcpkix-jdk15on:1.54'
     compile 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.0.2'
     
     testCompile "junit:junit:4.12"
