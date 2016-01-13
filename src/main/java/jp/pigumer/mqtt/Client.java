@@ -61,7 +61,7 @@ public class Client implements MqttCallback {
     
     void subscribe() throws Exception {
         client.connect(options);
-        client.subscribe("topic/test");
+        client.subscribe("test");
     }
 
     KeyStore loadKeyStore() throws IOException, KeyStoreException, NoSuchAlgorithmException, CertificateException {

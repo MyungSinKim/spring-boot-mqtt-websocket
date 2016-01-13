@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
     <head>
         <meta charset="UTF-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
         <title>test</title>
-        <link href="node_modules/bootstrap/dist/css/bootstrap.css" rel="stylesheet"/>
-        <script src="node_modules/jquery/dist/jquery.js" type="application/javascript"></script>
-        <script src="node_modules/bootstrap/dist/js/bootstrap.js" type="application/javascript"></script>
-        <script src="node_modules/stompjs/lib/stomp.js" type="application/javascript"></script>
+        <link href="../static/node_modules/bootstrap/dist/css/bootstrap.css" th:href="@{/node_modules/bootstrap/dist/css/bootstrap.css}" rel="stylesheet"/>
+        <script src="../static/node_modules/jquery/dist/jquery.js" th:src="@{/node_modules/jquery/dist/jquery.js}" type="application/javascript"></script>
+        <script src="../static/node_modules/bootstrap/dist/js/bootstrap.js" th:src="@{/node_modules/bootstrap/dist/js/bootstrap.js}" type="application/javascript"></script>
+        <script src="../static/node_modules/stompjs/lib/stomp.js" th:src="@{/node_modules/stompjs/lib/stomp.js}" type="application/javascript"></script>
         <script type="application/javascript">
             $(function() {
                 var ws = new WebSocket('ws://' + location.host + location.pathname + 'sample');
