@@ -3,6 +3,7 @@ package jp.pigumer.web;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import jp.pigumer.job.IntervalJob;
 import jp.pigumer.mqtt.Client;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -11,6 +12,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @EnableAutoConfiguration
 @Configuration
+@EnableScheduling
 public class Index {
     
     @RequestMapping("/")
@@ -25,6 +28,11 @@ public class Index {
         return "index";
     }
 
+    @Bean
+    public IntervalJob getJob() {
+        return new IntervalJob();
+    }
+    
     @Bean
     public Client getClient() throws IOException {
         DefaultResourceLoader loader = new DefaultResourceLoader();
