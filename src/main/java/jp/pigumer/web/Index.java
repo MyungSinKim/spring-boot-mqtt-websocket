@@ -15,6 +15,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @ComponentScan
 @Controller
@@ -28,6 +29,12 @@ public class Index {
         return "index";
     }
 
+    @RequestMapping("/json")
+    @ResponseBody
+    public Now now() {
+        return new Now("2016/01/01 00:00:00");
+    }
+    
     @Bean
     public IntervalJob getJob() {
         return new IntervalJob();

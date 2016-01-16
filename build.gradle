@@ -44,5 +44,6 @@ dependencies {
     compile 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.0.2'
     
     testCompile 'org.springframework.boot:spring-boot-starter-test'
+    testCompile 'org.skyscreamer:jsonassert'
     testCompile 'junit:junit'
 }
