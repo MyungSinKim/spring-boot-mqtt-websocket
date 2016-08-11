@@ -22,17 +22,15 @@ import org.bouncycastle.openssl.PEMParser;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.security.*;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -50,15 +48,15 @@ public class Client implements MqttCallback {
 
     MqttConnectOptions options;
     
-    String url;
+    final String url;
     
-    String caFile;
+    final Resource caFile;
 
-    String userName;
+    final String userName;
     
-    char[] password;
+    final char[] password;
     
-    public Client(String url, String caFile, String userName, String password) {
+    public Client(String url, Resource caFile, String userName, String password) {
         this.url = url;
         this.caFile = caFile;
         this.userName = userName;
@@ -73,11 +71,9 @@ public class Client implements MqttCallback {
     KeyStore loadKeyStore() throws IOException, KeyStoreException, NoSuchAlgorithmException, CertificateException {
         X509Certificate cert;
         
-        DefaultResourceLoader loader = new DefaultResourceLoader();
-        Resource resource = loader.getResource(caFile);
-        try (InputStream is = resource.getInputStream();
-                InputStreamReader isr = new InputStreamReader(is);
-                PEMParser parser = new PEMParser(isr)) {
+        try (InputStream is = caFile.getInputStream()) {
+            InputStreamReader isr = new InputStreamReader(is);
+            PEMParser parser = new PEMParser(isr);
             X509CertificateHolder holder = (X509CertificateHolder) parser.readObject();
             cert = new JcaX509CertificateConverter().getCertificate(holder);
         }
@@ -87,17 +83,19 @@ public class Client implements MqttCallback {
         return keyStore;
     }
 
-    TrustManagerFactory initTrustManagerFactory() throws KeyStoreException, NoSuchAlgorithmException, IOException, CertificateException {
-        TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-        tmf.init(loadKeyStore());
-        return tmf;
+    TrustManager[] initTrustManagers() throws KeyStoreException, NoSuchAlgorithmException, IOException, CertificateException {
+        if (null != caFile) {
+            Security.addProvider(new BouncyCastleProvider());
+            TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            tmf.init(loadKeyStore());
+            return tmf.getTrustManagers();
+        }
+        return null;
     }
     
     void createMqttConnectOptions() throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException, IOException, CertificateException {
-        Security.addProvider(new BouncyCastleProvider());
-        
         SSLContext context = SSLContext.getInstance("TLSv1.2");
-        context.init(null, initTrustManagerFactory().getTrustManagers(), new SecureRandom());
+        context.init(null, initTrustManagers(), new SecureRandom());
         
         options = new MqttConnectOptions();
         options.setUserName(userName);
@@ -151,5 +149,8 @@ public class Client implements MqttCallback {
     public void deliveryComplete(IMqttDeliveryToken token) {
         LOGGER.log(Level.INFO, token.toString());
     }
-    
+
+    public MqttClient getClient() {
+        return client;
+    }
 }

@@ -17,10 +17,12 @@ package jp.pigumer.web;
 
 import jp.pigumer.job.IntervalJob;
 import jp.pigumer.mqtt.Client;
+import jp.pigumer.mqtt.MqttProperties;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.stereotype.Controller;
@@ -28,14 +30,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
 
 @Controller
 @SpringBootApplication
 @EnableScheduling
+@EnableConfigurationProperties(MqttProperties.class)
 public class Index {
-    
+
+    @Autowired
+    MqttProperties properties;
+
     @RequestMapping("/")
     public String index() {
         return "index";
@@ -54,17 +58,10 @@ public class Index {
     
     @Bean
     public Client getClient() throws IOException {
-        DefaultResourceLoader loader = new DefaultResourceLoader();
-        Resource resource = loader.getResource("file:/var/lib/spring-boot-sample/mqtt.properties");
-        Properties properties;
-        try (InputStream is = resource.getInputStream()) {
-            properties = new Properties();
-            properties.load(is);
-        }
-        String url = properties.getProperty("url");
-        String caFile = properties.getProperty("caFile");
-        String userName = properties.getProperty("userName");
-        String password = properties.getProperty("password");
+        String url = properties.getUrl();
+        Resource caFile = properties.getCaFile();
+        String userName = properties.getUsername();
+        String password = properties.getPassword();
         return new Client(url, caFile, userName, password);
     }
     

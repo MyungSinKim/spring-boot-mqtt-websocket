@@ -15,17 +15,31 @@
  */
 package jp.pigumer.job;
 
+import jp.pigumer.mqtt.Client;
+import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
+
+import java.util.UUID;
 
 public class IntervalJob {
 
     private static Logger log = LoggerFactory.getLogger(IntervalJob.class);
-    
+
+    @Autowired
+    Client client;
+
     @Scheduled(fixedDelay = 5000)
     public void job() {
         log.info("job");
+        try {
+            client.getClient().publish("test", new MqttMessage(UUID.randomUUID().toString().getBytes()));
+        } catch (MqttException e) {
+            log.warn("publish", e);
+        }
     }
 
 }
