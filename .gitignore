@@ -1,6 +1,7 @@
-/.nb-gradle/
-/build/
-/.gradle/
+.nb-gradle/
+build/
+.gradle/
 node_modules/
 /src/test/resources/ca.crt
 /src/test/resources/mqtt.properties
+.idea/

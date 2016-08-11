@@ -15,16 +15,11 @@
  */
 package jp.pigumer.web;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
 import jp.pigumer.job.IntervalJob;
 import jp.pigumer.mqtt.Client;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -32,10 +27,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-@ComponentScan
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+
 @Controller
-@EnableAutoConfiguration
-@Configuration
+@SpringBootApplication
 @EnableScheduling
 public class Index {
     
