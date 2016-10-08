@@ -7,7 +7,7 @@ Spring BootによるMQTTとSTOMPの連携サンプル
 
 ```
 cd {ActiveMQをインストールしたディレクトリ}/bin
-./actimvemq start
+./activemq start
 ```
 
 # npmモジュールのインストール
