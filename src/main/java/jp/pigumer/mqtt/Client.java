@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Pigumer Group Inc.
+ * Copyright 2016 Pigumer Group.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@ import java.io.*;
 import java.security.*;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -68,39 +69,57 @@ public class Client implements MqttCallback {
         client.subscribe("test");
     }
 
-    KeyStore loadKeyStore() throws IOException, KeyStoreException, NoSuchAlgorithmException, CertificateException {
+    Optional<KeyStore> loadKeyStore() {
         X509Certificate cert;
-        
+
+        if (caFile == null) {
+            return Optional.empty();
+        }
         try (InputStream is = caFile.getInputStream()) {
             InputStreamReader isr = new InputStreamReader(is);
             PEMParser parser = new PEMParser(isr);
             X509CertificateHolder holder = (X509CertificateHolder) parser.readObject();
             cert = new JcaX509CertificateConverter().getCertificate(holder);
+            KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            keyStore.load(null, null);
+            keyStore.setCertificateEntry("ca", cert);
+            return Optional.of(keyStore);
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "failed load", e);
+            return Optional.empty();
         }
-        KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-        keyStore.load(null, null);
-        keyStore.setCertificateEntry("ca", cert);
-        return keyStore;
     }
 
-    TrustManager[] initTrustManagers() throws KeyStoreException, NoSuchAlgorithmException, IOException, CertificateException {
-        if (null != caFile) {
-            Security.addProvider(new BouncyCastleProvider());
-            TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-            tmf.init(loadKeyStore());
-            return tmf.getTrustManagers();
-        }
-        return null;
+    Optional<TrustManager[]> initTrustManagers() {
+        return loadKeyStore().map(keyStore -> {
+            try {
+                Security.addProvider(new BouncyCastleProvider());
+                TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+                tmf.init(keyStore);
+                return tmf.getTrustManagers();
+            } catch (Exception e) {
+                LOGGER.log(Level.SEVERE, "failed load", e);
+                return null;
+            }
+        });
     }
     
-    void createMqttConnectOptions() throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException, IOException, CertificateException {
-        SSLContext context = SSLContext.getInstance("TLSv1.2");
-        context.init(null, initTrustManagers(), new SecureRandom());
-        
+    void createMqttConnectOptions() {
+        Optional<SSLContext> context = initTrustManagers().map(trustManagers -> {
+            try {
+                SSLContext sslContext = SSLContext.getInstance("TLSv1.2");
+                sslContext.init(null, trustManagers, new SecureRandom());
+                return sslContext;
+            } catch (Exception e) {
+                LOGGER.log(Level.SEVERE, "failed load", e);
+                return null;
+            }
+        });
+
         options = new MqttConnectOptions();
         options.setUserName(userName);
         options.setPassword(password);
-        options.setSocketFactory(context.getSocketFactory());        
+        context.ifPresent(sslContext -> options.setSocketFactory(sslContext.getSocketFactory()));
     }
 
     void createMqttClient() throws MqttException {
