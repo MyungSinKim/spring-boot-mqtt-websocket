@@ -10,6 +10,8 @@ cd {ActiveMQをインストールしたディレクトリ}/bin
 ./activemq start
 ```
 
+* [ActiveMQの管理コンソール](http://localhost:8161)
+
 # npmモジュールのインストール
 
 プロジェクトのsrc/main/resources/staticでnpm installを実行します。
